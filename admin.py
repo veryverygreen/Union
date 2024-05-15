@@ -29,7 +29,7 @@ async def send_email(chat_id: int, msg:str, recipient:str):
         server.sendmail(sender, recipient, message)
         await bot.send_message(chat_id=chat_id, text="Запрос направлен. Мы свяжемся с Вами для его решения")
     except Exception as _ex:
-        return f"{_ex}"
+        return "На нашей стороне возникла ошибка, уже разбираемся с этим"
 
 async def admin_panel(msg:Message, router: Router):
     create_post_button = keyboards.admin_keyboard()
