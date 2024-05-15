@@ -1,4 +1,4 @@
-import config, keyboards, database
+import config, keyboards, database, smtplib
 from aiogram.types import Message
 from aiogram import Bot, types, Router, F
 from aiogram.fsm.context import FSMContext
@@ -17,9 +17,19 @@ async def get_question (chat_id: int, question:str):
 async def get_answer(chat_id: str, answer:str):
      await bot.send_message(chat_id=chat_id, text=answer)
 
-async def get_help(data: str, chat_id: str, answer:str):
+async def send_email(chat_id: int, msg:str, recipient:str):
+    message = msg.encode('utf-8')
+    sender = config.EMAIL_SENDER
+    password = config.EMAIL_PASSWORD
+    server = smtplib.SMTP("smtp.yandex.com", 587)
+    server.starttls()
 
-     await bot.send_message(chat_id=chat_id, text=answer)
+    try:
+        server.login(sender, password)
+        server.sendmail(sender, recipient, message)
+        await bot.send_message(chat_id=chat_id, text="Запрос направлен. Мы свяжемся с Вами для его решения")
+    except Exception as _ex:
+        return f"{_ex}"
 
 async def admin_panel(msg:Message, router: Router):
     create_post_button = keyboards.admin_keyboard()

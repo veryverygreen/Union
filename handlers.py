@@ -4,18 +4,25 @@ from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import Message, FSInputFile
 from aiogram.filters import Command
 from aiogram.enums import ParseMode
+
+import config
 import database, admin, keyboards
-from config import ADMIN_ID, QUESTION_ID, IDEA_ID
 
 router = Router()
 
 class choosing_state(StatesGroup):
     expected_idea = State()
     expected_faq = State()
+    expected_medical_aid = State()
+    expected_legal_aid = State()
+    expected_psychological_aid = State()
+    expected_financial_aid = State()
+    expected_difficult_situation_aid = State()
+    expected_other_questions = State()
 
 @router.message(Command("start"))
 async def start_handler(msg: Message):
-    if msg.chat.id == ADMIN_ID:
+    if msg.chat.id == config.ADMIN_ID:
         await admin.admin_panel(msg, router)
     else:
         chat_id = int(msg.chat.id)
@@ -49,34 +56,34 @@ async def message_handler(msg: Message):
     await msg.answer("Если у вас есть какие-то вопросы, проблемы выберите тему проблемы",
                      reply_markup=create_help_button.as_markup())
     @router.callback_query(F.data == "medical_aid")
-    async def medical_aid(callback: types.CallbackQuery):
-        await callback.message.answer("Напишите проблему и контакты, чтобы мы могли помочь ее решить:")
-        await msg.answer("medical_aid. Сообщение отправлено")
+    async def medical_aid(callback: types.CallbackQuery, state: FSMContext):
+        await callback.message.answer("Напишите проблему и свои контакты, чтобы мы могли помочь ее решить:")
+        await state.set_state(choosing_state.expected_medical_aid)
 
     @router.callback_query(F.data == "legal_aid")
-    async def medical_aid(callback: types.CallbackQuery):
-        await callback.message.answer("Напишите проблему и контакты, чтобы мы могли помочь ее решить:")
-        await msg.answer("legal_aid. Сообщение отправлено")
+    async def medical_aid(callback: types.CallbackQuery, state: FSMContext):
+        await callback.message.answer("Напишите проблему и свои контакты, чтобы мы могли помочь ее решить:")
+        await state.set_state(choosing_state.expected_legal_aid)
 
     @router.callback_query(F.data == "psychological_aid")
-    async def medical_aid(callback: types.CallbackQuery):
-        await callback.message.answer("Напишите проблему и контакты, чтобы мы могли помочь ее решить:")
-        await msg.answer("psychological_aid. Сообщение отправлено")
+    async def medical_aid(callback: types.CallbackQuery, state: FSMContext):
+        await callback.message.answer("Напишите проблему и свои контакты, чтобы мы могли помочь ее решить:")
+        await state.set_state(choosing_state.expected_psychological_aid)
 
     @router.callback_query(F.data == "financial_aid")
-    async def medical_aid(callback: types.CallbackQuery):
-        await callback.message.answer("Напишите проблему и контакты, чтобы мы могли помочь ее решить:")
-        await msg.answer("financial_aid. Сообщение отправлено")
+    async def medical_aid(callback: types.CallbackQuery, state: FSMContext):
+        await callback.message.answer("Напишите проблему и свои контакты, чтобы мы могли помочь ее решить:")
+        await state.set_state(choosing_state.expected_financial_aid)
 
     @router.callback_query(F.data == "difficult_situation_aid")
-    async def medical_aid(callback: types.CallbackQuery):
-        await callback.message.answer("Напишите проблему и контакты, чтобы мы могли помочь ее решить:")
-        await msg.answer("difficult_situation_aid. Сообщение отправлено")
+    async def medical_aid(callback: types.CallbackQuery, state: FSMContext):
+        await callback.message.answer("Напишите проблему и свои контакты, чтобы мы могли помочь ее решить:")
+        await state.set_state(choosing_state.expected_difficult_situation_aid)
 
     @router.callback_query(F.data == "other_questions")
-    async def medical_aid(callback: types.CallbackQuery):
-        await callback.message.answer("Напишите проблему и контакты, чтобы мы могли помочь ее решить:")
-        await msg.answer("other_questions. Сообщение отправлено")
+    async def medical_aid(callback: types.CallbackQuery, state: FSMContext):
+        await callback.message.answer("Напишите проблему и свои контакты, чтобы мы могли помочь ее решить:")
+        await state.set_state(choosing_state.expected_other_questions)
 
 @router.message(Command("faq"))
 async def message_handler(msg: Message):
@@ -99,11 +106,41 @@ async def callbacks_num(callback: types.CallbackQuery, state: FSMContext):
 @router.message(choosing_state.expected_idea)
 async def user_idea(msg: Message):
     idea = f"Новая идея: " + msg.text
-    await admin.get_question(IDEA_ID, idea)
+    await admin.get_question(config.IDEA_ID, idea)
     await msg.answer("Идея отправлена")
 
 @router.message(choosing_state.expected_faq)
 async def user_question(msg: Message):
     question = f"ID чата: " + str(msg.chat.id) + "\n" + msg.text
-    await admin.get_question(QUESTION_ID, question)
+    await admin.get_question(config.QUESTION_ID, question)
     await msg.answer("Вопрос отправлен")
+
+@router.message(choosing_state.expected_medical_aid)
+async def help(msg: Message):
+    recipient = config.MEDICAL_MAIL
+    await admin.send_email(msg.chat.id, msg.text, recipient)
+
+@router.message(choosing_state.expected_legal_aid)
+async def help(msg: Message):
+    recipient = config.LEGAL_MAIL
+    await admin.send_email(msg.chat.id, msg.text, recipient)
+
+@router.message(choosing_state.expected_psychological_aid)
+async def help(msg: Message):
+    recipient = config.PSYCHOLOGICAL_MAIL
+    await admin.send_email(msg.chat.id, msg.text, recipient)
+
+@router.message(choosing_state.expected_financial_aid)
+async def help(msg: Message):
+    recipient = config.FINANCIAL_MAIL
+    await admin.send_email(msg.chat.id, msg.text, recipient)
+
+@router.message(choosing_state.expected_difficult_situation_aid)
+async def help(msg: Message):
+    recipient = config.DIFFICULT_SITUATION_MAIL
+    await admin.send_email(msg.chat.id, msg.text, recipient)
+
+@router.message(choosing_state.expected_other_questions)
+async def help(msg: Message):
+    recipient = config.OTHER_QUESTIONS_MAIL
+    await admin.send_email(msg.chat.id, msg.text, recipient)
