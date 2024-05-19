@@ -27,3 +27,12 @@ def get_users():
     cursor.execute(f"SELECT chat_id FROM members")
     users_list = [item[0] for item in cursor.fetchall()]
     return users_list
+
+def get_content(type:str):
+    conn = psycopg2.connect(dbname=config.DB_NAME, user=config.DB_USER, password=config.DB_PASSWORD,
+                            host=config.DB_HOST)
+    conn.autocommit = True
+    cursor = conn.cursor()
+    cursor.execute(f"SELECT description FROM help_content WHERE content_type='{type}'")
+    content = str(cursor.fetchone())[2:][:-3].replace('\\n', '\n').replace('\\', '')
+    return content

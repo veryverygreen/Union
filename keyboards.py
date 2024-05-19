@@ -19,8 +19,15 @@ def faq_keyboard():
     return create_faq_button
 
 def admin_keyboard():
-    create_post_button = InlineKeyboardBuilder()
-    create_post_button.row(types.InlineKeyboardButton(text="Создать пост", callback_data="create_post"))
-    create_post_button.row(types.InlineKeyboardButton(text="Ответить на вопрос", callback_data="answer_questions"))
-    create_post_button.row(types.InlineKeyboardButton(text="Поменять раздел FAQ", callback_data="rewrite_faq"))
-    return create_post_button
+    create_admin_button = InlineKeyboardBuilder()
+    create_admin_button.row(types.InlineKeyboardButton(text="Создать пост", callback_data="create_post"))
+    create_admin_button.row(types.InlineKeyboardButton(text="Ответить на вопрос", callback_data="answer_questions"))
+    create_admin_button.row(types.InlineKeyboardButton(text="Поменять раздел FAQ", callback_data="rewrite_faq"))
+    return create_admin_button
+
+def financial_keyboard():
+    create_financial_button = InlineKeyboardBuilder()
+    create_financial_button.add(types.InlineKeyboardButton(text="Да", callback_data="Yes"),
+                                types.InlineKeyboardButton(text="Нет", callback_data="No"),
+                                types.InlineKeyboardButton(text="Не знаю", callback_data="Don't know"))
+    return create_financial_button

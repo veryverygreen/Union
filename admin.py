@@ -1,5 +1,6 @@
 import config, keyboards, database, smtplib
 from aiogram.types import Message
+from email.mime.text import MIMEText
 from aiogram import Bot, types, Router, F
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
@@ -18,7 +19,7 @@ async def get_answer(chat_id: str, answer:str):
      await bot.send_message(chat_id=chat_id, text=answer)
 
 async def send_email(chat_id: int, msg:str, recipient:str):
-    message = msg.encode('utf-8')
+    message = f"Пришел новый запрос:\n" + msg
     sender = config.EMAIL_SENDER
     password = config.EMAIL_PASSWORD
     server = smtplib.SMTP("smtp.yandex.com", 587)
@@ -26,15 +27,20 @@ async def send_email(chat_id: int, msg:str, recipient:str):
 
     try:
         server.login(sender, password)
-        server.sendmail(sender, recipient, message)
-        await bot.send_message(chat_id=chat_id, text="Запрос направлен. Мы свяжемся с Вами для его решения")
+        mess = MIMEText(message, 'html')
+        mess['From'] = sender
+        mess['To'] = recipient
+        mess['Subject'] = "Theme"
+        server.sendmail(sender, recipient, mess.as_string())
+        await bot.send_message(chat_id=chat_id, text="Ваша проблема принята. Мы обязательно поможем решить вашу "
+                                                     "проблему в течении 5 рабочих дней")
     except Exception as _ex:
-        return "На нашей стороне возникла ошибка, уже разбираемся с этим"
+        return f"{_ex}_"
 
 async def admin_panel(msg:Message, router: Router):
-    create_post_button = keyboards.admin_keyboard()
+    create_admin_button = keyboards.admin_keyboard()
     await msg.answer("Перед вами панель админа (возможности будут дополняться). Выберите действие",
-                     reply_markup=create_post_button.as_markup())
+                     reply_markup=create_admin_button.as_markup())
 
     @router.callback_query(F.data == "answer_questions")
     async def answer_questions(callback: types.CallbackQuery, state: FSMContext):
