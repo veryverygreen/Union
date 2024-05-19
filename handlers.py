@@ -18,6 +18,8 @@ class choosing_state(StatesGroup):
     expected_difficult_situation_aid = State()
     expected_other_questions = State()
 
+create_return_button = keyboards.return_keyboard()
+
 @router.message(Command("start"))
 async def start_handler(msg: Message):
     if msg.chat.id == config.ADMIN_ID:
@@ -36,7 +38,8 @@ async def message_handler(msg: Message):
 @router.message(Command("payment"))
 async def message_handler(msg: Message):
     document_payment = FSInputFile(path='C:\\Users\\Алексей\\PycharmProjects\\Union\\docs\\Заявление на мат.помощь.doc')
-    document_terms = FSInputFile(path='C:\\Users\\Алексей\\PycharmProjects\\Union\\docs\\Порядок выплаты мат.помощи.pdf')
+    document_terms = FSInputFile(path='C:\\Users\\Алексей\\PycharmProjects\\Union\\docs\\Порядок выплаты мат.помощи'
+                                      '.pdf')
     await msg.answer("Тут Вы можете посмотреть порядок выплат от профсоюз ")
     await msg.answer_document(document_terms)
     await msg.answer("Вам будет необходимо заполнить заявление, подписать его и скан направить на почту: "
@@ -45,42 +48,42 @@ async def message_handler(msg: Message):
 
 @router.message(Command("idea"))
 async def message_handler(msg: Message, state: FSMContext):
-    await msg.answer("Напишите свою идею, чтобы мы могли ее рассмотреть")
+    await msg.answer("Напишите свою идею, чтобы мы могли ее рассмотреть", reply_markup =
+                                      create_return_button.as_markup())
     await state.set_state(choosing_state.expected_idea)
 
 @router.message(Command("help"))
-async def message_handler(msg: Message):
+async def message_handler(msg: Message, state: FSMContext):
     create_help_button = keyboards.help_keyboard()
     await msg.answer("Если у вас есть какие-то вопросы, проблемы выберите тему проблемы",
                      reply_markup=create_help_button.as_markup())
     @router.callback_query(F.data == "medical_aid")
     async def medical_aid(callback: types.CallbackQuery, state: FSMContext):
         await callback.message.answer(database.get_content(f'{callback.data.split("_")[0]}'))
-        await callback.message.answer("Если ваша проблема не решена напишите нам ваш табельный номер, свою проблему "
-                                      "и контакты для связи, чтобы мы могли её решить")
-        await state.set_state(choosing_state.expected_medical_aid)
+        await callback.message.answer("Если ваша проблема не решена напишите нам ваш табельный номер, свою проблему"
+                                      "и контакты для связи, чтобы мы могли её решить", reply_markup =
+                                      create_return_button.as_markup())
 
     @router.callback_query(F.data == "legal_aid")
-    async def medical_aid(callback: types.CallbackQuery, state: FSMContext):
+    async def legal_aid(callback: types.CallbackQuery, state: FSMContext):
         await callback.message.answer(database.get_content(f'{callback.data.split("_")[0]}'))
-        await callback.message.answer("Если ваша проблема не решена напишите нам ваш табельный номер, свою проблему "
-                                      "и контакты для связи, чтобы мы могли её решить")
-        await state.set_state(choosing_state.expected_legal_aid)
+        await callback.message.answer("Если ваша проблема не решена напишите нам ваш табельный номер, свою проблему"
+                                      "и контакты для связи, чтобы мы могли её решить", reply_markup =
+                                      create_return_button.as_markup())
 
     @router.callback_query(F.data == "psychological_aid")
-    async def medical_aid(callback: types.CallbackQuery, state: FSMContext):
+    async def psychological_aid(callback: types.CallbackQuery, state: FSMContext):
         await callback.message.answer(database.get_content(f'{callback.data.split("_")[0]}'))
-        await callback.message.answer("Если ваша проблема не решена напишите нам ваш табельный номер, свою проблему "
-                                      "и контакты для связи, чтобы мы могли её решить")
-        await state.set_state(choosing_state.expected_psychological_aid)
+        await callback.message.answer("Если ваша проблема не решена напишите нам ваш табельный номер, свою проблему"
+                                      "и контакты для связи, чтобы мы могли её решить", reply_markup =
+                                      create_return_button.as_markup())
 
-
-#------------- Доделать клавиатуру Да/Нет/Не знаю
     @router.callback_query(F.data == "financial_aid")
-    async def medical_aid(callback: types.CallbackQuery, state: FSMContext):
+    async def financial_aid(callback: types.CallbackQuery):
         create_financial_button = keyboards.financial_keyboard()
-        await callback.message.answer(database.get_content(f'{callback.data.split("_")[0]}'),
-                         reply_markup=create_financial_button.as_markup())
+        await callback.message.answer(database.get_content(f'{callback.data.split("_")[0]}'), reply_markup =
+                                                           create_financial_button.as_markup())
+
         @router.callback_query(F.data == "Yes")
         async def answer_questions(callback: types.CallbackQuery):
             await callback.message.answer("Обратитесь за денежной компенсацией в профсоюз: "
@@ -99,19 +102,22 @@ async def message_handler(msg: Message):
             await state.set_state(choosing_state.expected_financial_aid)
 
     @router.callback_query(F.data == "difficult_situation_aid")
-    async def medical_aid(callback: types.CallbackQuery, state: FSMContext):
-        await callback.message.answer("Напишите нам ваш табельный номер, свою проблему и контакты для связи, чтобы мы "
-                                      "могли её решить.")
-        await state.set_state(choosing_state.expected_difficult_situation_aid)
+    async def difficult_situation_aid(callback: types.CallbackQuery):
+        await callback.message.answer("Напишите нам ваш табельный номер, свою проблему и контакты для связи, чтобы"
+                                      " мы могли её решить.", reply_markup = create_return_button.as_markup())
 
     @router.callback_query(F.data == "other_questions")
-    async def medical_aid(callback: types.CallbackQuery, state: FSMContext):
-        await callback.message.answer("Напишите нам ваш табельный номер, свою проблему и контакты для связи, чтобы мы "
-                                      "могли её решить.")
-        await state.set_state(choosing_state.expected_other_questions)
+    async def other_questions(callback: types.CallbackQuery):
+        await callback.message.answer("Напишите нам ваш табельный номер, свою проблему и контакты для связи, чтобы"
+                                      " мы могли её решить.", reply_markup = create_return_button.as_markup())
+
+    @router.callback_query(F.data == "Back")
+    async def answer_questions(callback: types.CallbackQuery):
+        await msg.answer("Если у вас есть какие-то вопросы, проблемы выберите тему проблемы",
+                         reply_markup=create_help_button.as_markup())
 
 @router.message(Command("faq"))
-async def message_handler(msg: Message):
+async def faq(msg: Message):
     create_faq_button = keyboards.faq_keyboard()
     with open('faq.txt', 'r', encoding='utf-8') as f:
         text = f.read()

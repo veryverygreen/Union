@@ -30,4 +30,10 @@ def financial_keyboard():
     create_financial_button.add(types.InlineKeyboardButton(text="Да", callback_data="Yes"),
                                 types.InlineKeyboardButton(text="Нет", callback_data="No"),
                                 types.InlineKeyboardButton(text="Не знаю", callback_data="Don't know"))
+    create_financial_button.row(types.InlineKeyboardButton(text="Назад", callback_data="Back"))
     return create_financial_button
+
+def return_keyboard():
+    create_return_button = InlineKeyboardBuilder()
+    create_return_button.add(types.InlineKeyboardButton(text="Назад", callback_data="Back"))
+    return create_return_button
