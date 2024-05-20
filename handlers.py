@@ -48,8 +48,7 @@ async def message_handler(msg: Message):
 
 @router.message(Command("idea"))
 async def message_handler(msg: Message, state: FSMContext):
-    await msg.answer("Напишите свою идею, чтобы мы могли ее рассмотреть", reply_markup =
-                                      create_return_button.as_markup())
+    await msg.answer("Напишите свою идею, чтобы мы могли ее рассмотреть", reply_markup=create_return_button.as_markup())
     await state.set_state(choosing_state.expected_idea)
 
 @router.message(Command("help"))
@@ -153,29 +152,29 @@ async def user_question(msg: Message):
 @router.message(choosing_state.expected_medical_aid)
 async def help(msg: Message):
     recipient = config.MEDICAL_MAIL
-    await admin.send_email(msg.chat.id, msg.text, recipient)
+    await admin.send_email(msg.chat.id, msg, recipient)
 
 @router.message(choosing_state.expected_legal_aid)
 async def help(msg: Message):
     recipient = config.LEGAL_MAIL
-    await admin.send_email(msg.chat.id, msg.text, recipient)
+    await admin.send_email(msg.chat.id, msg, recipient)
 
 @router.message(choosing_state.expected_psychological_aid)
 async def help(msg: Message):
     recipient = config.PSYCHOLOGICAL_MAIL
-    await admin.send_email(msg.chat.id, msg.text, recipient)
+    await admin.send_email(msg.chat.id, msg, recipient)
 
 @router.message(choosing_state.expected_financial_aid)
 async def help(msg: Message):
     recipient = config.FINANCIAL_MAIL
-    await admin.send_email(msg.chat.id, msg.text, recipient)
+    await admin.send_email(msg.chat.id, msg, recipient)
 
 @router.message(choosing_state.expected_difficult_situation_aid)
 async def help(msg: Message):
     recipient = config.DIFFICULT_SITUATION_MAIL
-    await admin.send_email(msg.chat.id, msg.text, recipient)
+    await admin.send_email(msg.chat.id, msg, recipient)
 
 @router.message(choosing_state.expected_other_questions)
 async def help(msg: Message):
     recipient = config.OTHER_QUESTIONS_MAIL
-    await admin.send_email(msg.chat.id, msg.text, recipient)
+    await admin.send_email(msg.chat.id, msg, recipient)

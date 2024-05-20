@@ -29,14 +29,15 @@ def get_username (msg: types.Message):
             user_id = name
     return user_id
 
-async def get_question (chat_id: int, question:str):
+async def get_question (chat_id: int, question: str):
     await bot.send_message(chat_id=chat_id, text=question)
 
-async def get_answer(chat_id: str, answer:str):
+async def get_answer(chat_id: str, answer: str):
      await bot.send_message(chat_id=chat_id, text=answer)
 
-async def send_email(chat_id: int, msg:str, recipient:str):
-    message = f"Пришел новый запрос:\n" + msg
+async def send_email(chat_id: int, msg: Message, recipient: str):
+    message = f"Пришел новый запрос:\n" + msg.text
+    subject = get_username(msg)
     sender = config.EMAIL_SENDER
     password = config.EMAIL_PASSWORD
     server = smtplib.SMTP("smtp.yandex.com", 587)
@@ -47,7 +48,7 @@ async def send_email(chat_id: int, msg:str, recipient:str):
         mess = MIMEText(message, 'html')
         mess['From'] = sender
         mess['To'] = recipient
-        mess['Subject'] = "Theme"
+        mess['Subject'] = f"{subject}"
         server.sendmail(sender, recipient, mess.as_string())
         await bot.send_message(chat_id=chat_id, text="Ваша проблема принята. Мы обязательно поможем решить вашу "
                                                      "проблему в течении 5 рабочих дней")
