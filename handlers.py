@@ -63,6 +63,7 @@ async def message_handler(msg: Message, state: FSMContext):
         await callback.message.answer("Если ваша проблема не решена напишите нам ваш табельный номер, свою проблему"
                                       "и контакты для связи, чтобы мы могли её решить", reply_markup =
                                       create_return_button.as_markup())
+        await state.set_state(choosing_state.expected_medical_aid)
 
     @router.callback_query(F.data == "legal_aid")
     async def legal_aid(callback: types.CallbackQuery, state: FSMContext):
@@ -70,6 +71,7 @@ async def message_handler(msg: Message, state: FSMContext):
         await callback.message.answer("Если ваша проблема не решена напишите нам ваш табельный номер, свою проблему"
                                       "и контакты для связи, чтобы мы могли её решить", reply_markup =
                                       create_return_button.as_markup())
+        await state.set_state(choosing_state.expected_legal_aid)
 
     @router.callback_query(F.data == "psychological_aid")
     async def psychological_aid(callback: types.CallbackQuery, state: FSMContext):
@@ -89,12 +91,12 @@ async def message_handler(msg: Message, state: FSMContext):
             await callback.message.answer("Обратитесь за денежной компенсацией в профсоюз: "
                                           "https://sberfriend.sbrf.ru/sberfriend/#/application/563DB41AB53E49C9BB9C37"
                                           "B880E1A1E6 ")
-        @router.callback_query(F.data == "No")
+        @router.callback_query(F.data == "Don't know")
         async def answer_questions(callback: types.CallbackQuery):
             await callback.message.answer("Ознакомиться с перечнем компенсации вы можете, прописав здесь команду"
                                           " /payment")
 
-        @router.callback_query(F.data == "Don't know")
+        @router.callback_query(F.data == "No")
         async def answer_questions(callback: types.CallbackQuery, state: FSMContext):
             await callback.message.answer(
                 "Напишите нам ваш табельный номер, свою проблему и контакты для связи, чтобы мы "
@@ -105,11 +107,13 @@ async def message_handler(msg: Message, state: FSMContext):
     async def difficult_situation_aid(callback: types.CallbackQuery):
         await callback.message.answer("Напишите нам ваш табельный номер, свою проблему и контакты для связи, чтобы"
                                       " мы могли её решить.", reply_markup = create_return_button.as_markup())
+        await state.set_state(choosing_state.expected_difficult_situation_aid)
 
     @router.callback_query(F.data == "other_questions")
     async def other_questions(callback: types.CallbackQuery):
         await callback.message.answer("Напишите нам ваш табельный номер, свою проблему и контакты для связи, чтобы"
                                       " мы могли её решить.", reply_markup = create_return_button.as_markup())
+        await state.set_state(choosing_state.expected_other_questions)
 
     @router.callback_query(F.data == "Back")
     async def answer_questions(callback: types.CallbackQuery):

@@ -12,6 +12,23 @@ class choosing_admin_state(StatesGroup):
     expected_image = State()
     expected_rewrite_faq = State()
 
+def get_username (msg: types.Message):
+    username = str(msg.from_user.username)
+    if username != None:
+        user_id=username
+    else:
+        name = str(msg.from_user.id)
+        first_name = str(msg.from_user.first_name)
+        last_name = str(msg.from_user.last_name)
+        if name.isdigit() == True:
+            if last_name == None:
+                user_id = first_name
+            else:
+                user_id = first_name + last_name
+        else:
+            user_id = name
+    return user_id
+
 async def get_question (chat_id: int, question:str):
     await bot.send_message(chat_id=chat_id, text=question)
 
